@@ -1,0 +1,309 @@
+#! /usr/bin/guile -s
+!#
+
+; STOP AND ARITHMETIC OPs
+; -----------------------
+(define (STOP) "00")
+
+(define (ADD x y)
+  (string-append y x "01"))
+
+(define (MUL x y)
+  (string-append y x "02"))
+
+(define (SUB x y)
+  (string-append y x "03"))
+
+(define (DIV x y)
+  (string-append y x "04"))
+
+(define (SDIV x y)
+  (string-append y x "05"))
+
+(define (MOD x y)
+  (string-append y x "06"))
+
+(define (SMOD x y)
+  (string-append y x "07"))
+
+(define (ADDMOD x y z)
+  (string-append z y x "08"))
+
+(define (MULMOD x y z)
+  (string-append z y x "09"))
+
+(define (EXP x y)
+  (string-append y x "0a"))
+
+(define (SIGNEXTEND x y)
+  (string-append y x "0b"))
+
+; COMPARISON AND BITWISE LOGIC
+; ----------------------------
+(define (LT x y)
+  (string-append y x "10"))
+
+(define (GT x y)
+  (string-append y x "11"))
+
+(define (SLT x y)
+  (string-append y x "12"))
+
+(define (SGT x y)
+  (string-append y x "13"))
+
+(define (EQ x y)
+  (string-append y x "14"))
+
+(define (ISZERO x)
+  (string-append x "15"))
+
+(define (AND x y)
+  (string-append y x "16"))
+
+(define (OR x y)
+  (string-append y x "17"))
+
+(define (XOR x y)
+  (string-append y x "18"))
+
+(define (NOT x)
+  (string-append x "19"))
+
+(define (BYTE x y)
+  (string-append y x "1a"))
+
+; SHA3 OPS
+; --------
+(define (SHA3 x y)
+  (string-append y x "20"))
+
+; ENVIRONMENTAL INFORMATION
+; -------------------------
+(define (ADDRESS) "30")
+
+(define (BALANCE x)
+  (string-append x "31"))
+
+(define (ORIGIN) "32")
+
+(define (CALLER) "33")
+
+(define (CALLVALUE) "34")
+
+(define (CALLDATALOAD x)
+  (string-append x "35"))
+
+(define (CALLDATASIZE) "36")
+
+(define (CALLDATACOPY x y z)
+  (string-append z y x "37"))
+
+(define (CODESIZE) "38")
+
+(define (CODECOPY x y z)
+  (string-append z y x "39"))
+
+(define (GASPRICE) "3a")
+
+(define (EXTCODESIZE x)
+  (string-append x "3b"))
+
+(define (EXTCODECOPY x y z a)
+  (string-append a z y x "3c"))
+
+; BLOCK INFORMATION
+; -----------------
+(define (BLOCKHASH x)
+  (string-append x "40"))
+
+(define (COINBASE) "41")
+(define (TIMESTAMP) "42")
+(define (NUMBER) "43")
+(define (DIFFICULTY) "44")
+(define (GASLIMIT) "45")
+
+; STACK, MEMORY, STORAGE AND FLOW OPs
+; -----------------------------------
+(define (POP) "50")
+
+(define (MLOAD x)
+  (string-append x "51"))
+
+(define (MSTORE x y)
+  (string-append y x "52"))
+
+(define (MSTORE8 x y)
+  (string-append y x "53"))
+
+(define (SLOAD x)
+  (string-append x "54"))
+
+(define (SSTORE x y)
+  (string-append y x "55"))
+
+;; JUMP - do not use directly
+(define (JUMP) "56")
+;; JUMPI- do not use directly
+(define (JUMPI) "57")
+
+(define (PC) "58")
+(define (MSIZE) "59")
+(define (GAS) "5a")
+(define (JUMPDEST) "5b")
+
+; PUSH OPERATIONS
+; ---------------
+(define (PUSH x)
+  (let* ((b 96) (n (number->string x 16)) (l (string-length n)))
+	(if (odd? l)
+	  (begin (set! l (+ l 1))
+	   (set! n (string-append "0" n))))
+	(string-append (number->string (+ (- b 1) (/ l 2)) 16) n)))
+
+
+; DUPLICATION OPERATIONS
+; ----------------------
+
+(define (DUP x)
+  (let ((b 128))
+	(number->string (+ b (- x 1) 16))))
+
+(define (DUP1) "80")
+(define (DUP2) "81")
+(define (DUP3) "82")
+(define (DUP4) "83")
+(define (DUP5) "84")
+(define (DUP6) "85")
+(define (DUP7) "86")
+(define (DUP8) "87")
+(define (DUP9) "88")
+(define (DUP10) "89")
+(define (DUP11) "8a")
+(define (DUP12) "8b")
+(define (DUP13) "8c")
+(define (DUP14) "8d")
+(define (DUP15) "8e")
+(define (DUP16) "8f")
+
+; EXCHANGE OPERATIONS
+; -------------------
+(define (SWAP x)
+  (let ((b 144))
+	(number->string (+ b (- x 1) 16))))
+
+(define (SWAP1) "90")
+(define (SWAP2) "91")
+(define (SWAP3) "92")
+(define (SWAP4) "93")
+(define (SWAP5) "94")
+(define (SWAP6) "95")
+(define (SWAP7) "96")
+(define (SWAP8) "97")
+(define (SWAP9) "98")
+(define (SWAP10) "99")
+(define (SWAP11) "9a")
+(define (SWAP12) "9b")
+(define (SWAP13) "9c")
+(define (SWAP14) "9d")
+(define (SWAP15) "9e")
+(define (SWAP16) "9f")
+
+; LOGGING OPERATIONS
+; ------------------
+
+
+(define (LOG0) "a0")
+(define (LOG1) "a1")
+(define (LOG2) "a2")
+(define (LOG3) "a3")
+(define (LOG4) "a4")
+
+
+; SYSTEM OPERATIONS
+; -----------------
+(define (CREATE x y z)
+  (string-append z y x "f0"))
+
+(define (CALL a b c d e f g)
+  (string-append g f e d c b a "f1"))
+
+(define (CALLCODE a b c d e f g)
+  (string-append g f e d c b a "f2"))
+
+(define (RETURN x y)
+  (string-append y x "f3"))
+
+(define (DELEGATECALL a b c d e f g)
+  (string-append g f e d c b a "f4"))
+
+(define (SUICIDE) "ff")
+
+; HIGHER ORDER HELPERS
+; --------------------
+
+(define (label-counter-create)
+  (let ((count 0))
+	(lambda ()
+		(set! count (+ count 1))
+		(string-append ":" (number->string count) ":"))))
+
+(define label-counter (label-counter-create))
+
+(define (mark-jump label)
+  (string-append "J" label))
+
+(define (mark-dest label)
+  (string-append "X" label))
+
+(define (IF pred t f)
+  (let* ((label-t (label-counter)) (label-f (label-counter)))
+	  (string-append (ISZERO pred) (mark-jump label-f) (JUMPI) t (mark-jump label-t) (JUMP) (mark-dest label-f) f (mark-dest label-t))))
+
+(define (WHEN pred body)
+  (let ((label (label-counter)))
+	  (string-append (ISZERO pred) (mark-jump label) (JUMPI) body (mark-dest label))))
+
+(define (FOR init pred post body)
+  (let* ((label-start (label-counter)) (label-end (label-counter)))
+	(string-append init (mark-dest label-start) (ISZERO pred) (mark-jump label-end) (JUMPI) body post (mark-jump label-start) (JUMP) (mark-dest label-end))))
+
+(define (WHILE pred  body)
+  (let* ((label-start (label-counter)) (label-end (label-counter)))
+	(string-append (mark-dest label-start) (ISZERO pred) (mark-jump label-end) (JUMPI) body (mark-jump label-start) (JUMP) (mark-dest label-end))))
+
+(define (SEQ . code)
+  (apply string-append code))
+
+(define (START . code)
+  (let loop ((cl code))
+	(if (> (length cl) 0)
+	  (begin
+		(display (car cl))
+		(loop (cdr cl))))))
+
+
+(define (@ x) (MLOAD x))
+(define ($ x y) (MSTORE  x y))
+(define (@@ x) (SLOAD x))
+(define ($$ x y) (SSTORE x y))
+
+(define P PUSH)
+
+; guile specific stuff
+(use-modules (ice-9 rdelim))
+(use-modules (ice-9 eval-string))
+(use-modules (ice-9 regex))
+
+(define source "")
+
+(define args (command-line))
+(if (> (length args) 2)
+  (set! source (call-with-input-file (car (cdr args)) (lambda (input-port) (read-string input-port))))
+  (set! source (read-string)))
+
+; guile doesn't support negative/positive lookahead... boo, have to do this step in python
+;(define source-preproc (regexp-substitute/global #f "\\b[0-9]+\\b"  source   'pre (lambda (m) (string-append "(PUSH " (match:substring m) ")")) 'post))
+;(define source-preproc2 (regexp-substitute/global #f "\\b0x[0-9]+\\b"  source-preproc   'pre (lambda (m) (string-append "(PUSH (string->number (substring \"" (match:substring m) "\" 2) 16))")) 'post))
+
+(eval-string source)

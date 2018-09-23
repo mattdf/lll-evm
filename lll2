@@ -1,0 +1,79 @@
+#!/usr/bin/python
+
+import re
+from sys import argv, stdin
+
+def calculate_jump(code_segments, index):
+    offset = 0
+    for x in range(0, index):
+        i = code_segments[x]
+        if i[0] == 'J':
+            offset += 3
+        elif i[0] == 'X':
+            offset += 1
+        else:
+            offset += len(i)/2
+    return offset
+
+if len(argv) > 1:
+    with open (argv[1], "r") as asm:
+            data = asm.readlines()[0]
+else:
+    data = stdin.readlines()[0]
+
+jump_points = []
+label_points = []
+
+p = re.compile("J\:([0-9]+)\:")
+iterator = p.finditer(data)
+
+for i in iterator:
+    jump_points.append((i.group(0), i.span()))
+
+p = re.compile("X\:([0-9]+)\:")
+iterator = p.finditer(data)
+
+for i in iterator:
+    jump_points.append((i.group(0), i.span()))
+
+sorted_jumps = sorted(jump_points, key=lambda x: x[1][0])
+
+code_segments = []
+offset = 0
+index = 0
+lookup_table = dict()
+
+for i in sorted_jumps:
+    span = i[1]
+    segment = data[offset:span[0]]
+    if len(segment) > 0:
+        code_segments.append(segment)
+    if len(i[0]) > 0:
+        code_segments.append(i[0])
+    offset = span[1]
+    index = len(code_segments)-1
+    if i[0][0] == 'X':
+        lookup_table['J' + i[0][1:]] = index
+if (data[offset:]) > 0:
+    code_segments.append(data[offset:])
+
+#print code_segments
+#print lookup_table
+
+opcodes = ""
+
+offset = 0
+for segment in code_segments:
+    if segment[0] == 'J':
+        jump = calculate_jump(code_segments, lookup_table[segment])
+        opcodes += '61' + format(jump, '04x')
+    elif segment[0] == 'X':
+        opcodes += '5b'
+    else:
+        opcodes += segment
+
+init_bin = '61:len:80600c6000396000f3'
+
+ops_len = len(opcodes)/2
+
+print init_bin.replace(":len:", format(ops_len, '04x')) + opcodes

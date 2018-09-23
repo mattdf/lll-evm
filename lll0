@@ -1,0 +1,17 @@
+#!/usr/bin/python
+
+import re
+from sys import argv
+
+f = argv[1]
+
+with open(f) as file:
+	data = file.read()
+
+sub1 = re.compile("(\\b[0-9]+\\b)(?=(?:[^\"]|\"[^\"]*\")*$)")
+sub2 = re.compile("(\\b0x[0-9A-Fa-f]+\\b)(?=(?:[^\"]|\"[^\"]*\")*$)")
+data = sub1.sub(r'(PUSH \1)', data)
+data = sub2.sub(r'(PUSH (string->number (substring "\1" 2) 16))', data)
+
+print data
+
